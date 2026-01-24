@@ -8,7 +8,7 @@ class DefaultFirebaseOptions {
       appId: "1:4196720419:web:c4c6063f08bf6afdaab696",
       messagingSenderId: "4196720419",
       projectId: "managio-3f008",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      authDomain: "managio-3f008.firebaseapp.com",
       storageBucket: "managio-3f008.firebasestorage.app",
       measurementId: "G-SHCB0542W1",
     );
