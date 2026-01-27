@@ -179,6 +179,7 @@ Include the following screenshots in your PR:
 ![Firestore Data](screenshots/firestore_data.png)
 ![Firestore Console](screenshots/firebase_console.png)
 ![User task](screenshots/user_task.png)
+![Folder Structure](screenshots/folder_struc.png)
 
 🧠 Reflection
 🔹 Challenges Faced
@@ -210,3 +211,22 @@ Real-time updates across devices
 No backend server maintenance
 
 Ideal for collaborative and live apps
+
+📂 Project Structure Overview
+
+This project follows Flutter’s standard and recommended folder structure to ensure clean code organization, scalability, and team collaboration.
+
+The core application logic resides inside the lib/ directory, while platform-specific build configurations are handled separately for Android and iOS. Supporting folders such as assets/, test/, and configuration files like pubspec.yaml help manage resources, dependencies, and testing.
+
+📄 Detailed Explanation:
+For a complete breakdown of each folder and file, including their roles and how they support Flutter’s cross-platform architecture, refer to:
+
+➡️ PROJECT_STRUCTURE.md
+
+This document explains:
+
+The purpose of each major folder (lib, android, ios, assets, etc.)
+
+How Flutter connects a single Dart codebase to Android and iOS builds
+
+Why a well-structured project improves scalability and teamwork
