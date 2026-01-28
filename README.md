@@ -1,212 +1,299 @@
-Managio – Firebase-Integrated Freelancer Task Management App
+# MANAGIO - Firebase Authentication Flow
 
-Managio is a Flutter-based task management application designed for freelancers to manage tasks efficiently using Firebase Authentication and Cloud Firestore.
-This project demonstrates a complete Firebase integration including authentication, real-time database operations, and persistent user sessions.
+A Flutter-based task management application demonstrating complete Firebase Authentication implementation with sign up, login, and logout flows for freelancers to manage tasks efficiently.
 
-📌 Sprint-2 Objective
+## 📌 Assignment 2.29 Overview
 
-Integrate Firebase Authentication and Cloud Firestore into a Flutter application to enable:
+This project implements a seamless authentication flow using Firebase Authentication in Flutter, including:
+- **Sign Up** – Create new user accounts
+- **Login** – Authenticate existing users
+- **Logout** – End session and return to login screen
+- **Real-time Auth State Management** – Automatic navigation based on user session
 
-Secure user login and signup
+## 🔐 Authentication Flow Explanation
 
-Persistent authentication state
-
-Real-time database CRUD operations
-
-Scalable backend without a traditional server
-
-🔐 Firebase Authentication Flow
-
-App launches
-
-Firebase checks the authentication state
-
-New users sign up using Email & Password
-
-Existing users log in securely
-
-On success, users are redirected to the Dashboard
-
-Session persists even after app restart
-
-Firebase automatically manages:
-
-Password hashing
-
-Session tokens
-
-Secure login state
-
-🗄️ Firestore Database Functionality
-
-Each authenticated user can:
-
-➕ Add records (tasks)
-
-✏️ Edit records
-
-❌ Delete records
-
-👀 View real-time updates
-
-All records are stored inside Cloud Firestore, scoped to the logged-in user.
-
-Firestore enables:
-
-Real-time sync
-
-Automatic UI updates
-
-Secure, scalable data storage
-
-🧩 Features Implemented
-
-Unified Login / Signup Screen
-
-Email & Password Authentication
-
-Auth-based navigation flow
-
-Firestore CRUD operations
-
-Real-time database updates
-
-Persistent user sessions
-
-Clean service-based architecture
-
-🛠️ Tech Stack
-
-Flutter – UI framework
-
-Firebase Core – Firebase initialization
-
-Firebase Authentication – User management
-
-Cloud Firestore – Real-time database
-
-🔥 Firebase Setup Instructions
-
-Create a project in Firebase Console
-
-Add a Web App to the project
-
-Enable Authentication → Email/Password
-
-Enable Cloud Firestore (test mode)
-
-Install Firebase CLI & FlutterFire CLI
-
-Run:
-
-flutterfire configure
-
-
-Add dependencies in pubspec.yaml
-
-Initialize Firebase in main.dart
-
-Use service files:
-
-auth_service.dart
-
-firestore_service.dart
-
-🧑‍💻 Code Snippets
-🔐 Authentication – Signup
-Future<User?> signUp(String email, String password) async {
-  final credential = await FirebaseAuth.instance
-      .createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+### Sign Up Logic
+New users can create an account using email and password authentication:
+```dart
+Future signUp(String email, String password) async {
+  final UserCredential credential =
+      await _auth.createUserWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
   return credential.user;
 }
+```
 
-🔐 Authentication – Login
-Future<User?> login(String email, String password) async {
-  final credential = await FirebaseAuth.instance
-      .signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+**What happens during signup:**
+1. User enters email and password in the login screen
+2. `createUserWithEmailAndPassword()` creates a new Firebase account
+3. Firestore profile is automatically created with user email and timestamp
+4. User is redirected to the Dashboard screen
+5. Session persists even after app restart
+
+### Login Logic
+Existing users authenticate with their credentials:
+```dart
+Future signIn(String email, String password) async {
+  final UserCredential credential =
+      await _auth.signInWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
   return credential.user;
 }
+```
 
-🗄️ Firestore – Add Record
-Future<void> addTask(String uid, Map<String, dynamic> data) async {
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('tasks')
-      .add(data);
+**What happens during login:**
+1. User enters registered email and password
+2. `signInWithEmailAndPassword()` validates credentials
+3. Firebase returns authenticated user session
+4. App automatically navigates to Dashboard
+5. User can now perform CRUD operations on tasks
+
+### Logout Logic
+Users can securely end their session:
+```dart
+Future signOut() async {
+  await _auth.signOut();
 }
+```
 
-✏️ Firestore – Update Record
-Future<void> updateTask(String uid, String taskId, Map<String, dynamic> data) async {
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('tasks')
-      .doc(taskId)
-      .update(data);
+**What happens during logout:**
+1. User clicks logout icon in Dashboard AppBar
+2. `FirebaseAuth.instance.signOut()` clears the session
+3. Auth state changes to `null`
+4. App automatically redirects to Login screen
+5. All session tokens are invalidated
+
+### authStateChanges() - Real-time Session Management
+
+Although not explicitly in `main.dart` with StreamBuilder in this implementation, the app uses navigation-based auth handling:
+```dart
+// In login_screen.dart after successful auth:
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (_) => const DashboardScreen(),
+  ),
+);
+
+// In dashboard_screen.dart for logout:
+await _authService.signOut();
+if (mounted) {
+  Navigator.pushReplacementNamed(context, '/');
 }
+```
 
-❌ Firestore – Delete Record
-Future<void> deleteTask(String uid, String taskId) async {
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('tasks')
-      .doc(taskId)
-      .delete();
+**How it works:**
+- Firebase maintains the authentication state in the background
+- `FirebaseAuth.instance.currentUser` returns current user or null
+- Navigation logic ensures users see appropriate screens based on auth state
+- No manual session management required
+
+## 📱 Screen Code Snippets
+
+### Login Screen (Sign Up + Login Toggle)
+```dart
+class LoginScreen extends StatefulWidget {
+  // ... state management
+  
+  bool isLogin = true; // Toggle between login and signup modes
+  
+  Future handleAuth() async {
+    if (isLogin) {
+      await _authService.signIn(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+    } else {
+      final user = await _authService.signUp(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+      await _firestoreService.createUserProfile(
+        emailController.text.trim(),
+      );
+    }
+    // Navigate to dashboard on success
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const DashboardScreen()),
+    );
+  }
+  
+  // Toggle button
+  TextButton(
+    onPressed: () {
+      setState(() {
+        isLogin = !isLogin;
+      });
+    },
+    child: Text(
+      isLogin
+          ? "Don't have an account? Sign up"
+          : "Already have an account? Login",
+    ),
+  )
 }
+```
 
-📸 Screenshots (Required)
+**Key Features:**
+- Single screen handles both signup and login
+- Toggle button switches between modes
+- Email validation (must contain @)
+- Password validation (minimum 8 characters)
+- Loading indicator during authentication
+- Error handling with SnackBar messages
 
-Include the following screenshots in your PR:
+### Dashboard Screen (Logged-in State)
+```dart
+class DashboardScreen extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('MANAGIO Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await _authService.signOut();
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, '/');
+              }
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Task input field
+          // StreamBuilder for real-time task list
+          // Edit and Delete functionality
+        ],
+      ),
+    );
+  }
+}
+```
 
-✅ Firebase Authentication → Users
+**Key Features:**
+- Displays user's tasks from Firestore
+- Real-time updates using StreamBuilder
+- Add, edit, delete task operations
+- Logout button in AppBar
+- Automatic redirect to login on logout
 
-✅ Cloud Firestore → Data
+## 🗄️ Firestore Integration
 
-✅ Working Login & Signup Screen
+### Create User Profile
+```dart
+Future createUserProfile(String email) async {
+  final uid = _auth.currentUser!.uid;
+  await _db.collection('users').doc(uid).set({
+    'email': email,
+    'createdAt': Timestamp.now(),
+  });
+}
+```
 
-✅ Add / Edit / Delete Firestore Records
+### Add Task
+```dart
+Future addTask(String title) async {
+  final uid = _auth.currentUser!.uid;
+  await _db.collection('tasks').add({
+    'uid': uid,
+    'title': title,
+    'createdAt': Timestamp.now(),
+  });
+}
+```
 
+### Real-time Task Stream
+```dart
+Stream getTasks() {
+  final uid = _auth.currentUser!.uid;
+  return _db
+      .collection('tasks')
+      .where('uid', isEqualTo: uid)
+      .snapshots();
+}
+```
 
-![Firebase Auth Users](screenshots/auth_users.png)
+## 📸 Screenshots
+
+### 1. Login/Signup Screen
+![Login Screen](screenshots/auth_users.png)
+
+### 2. Dashboard with Tasks
+![Dashboard](screenshots/user_task.png)
+
+### 3. Firebase Console - Authentication
+![Firebase Auth](screenshots/firebase_console.png)
+
+### 4. Firebase Console - Firestore Data
 ![Firestore Data](screenshots/firestore_data.png)
-![Firestore Console](screenshots/firebase_console.png)
-![User task](screenshots/user_task.png)
 
-🧠 Reflection
-🔹 Challenges Faced
+## 🧠 Reflection
 
-Firebase web configuration mismatches
+### What was the hardest part of building the flow?
 
-Proper initialization order in Flutter
+The most challenging aspect was managing the authentication state seamlessly across screens without using a global StreamBuilder in `main.dart`. Initially, I struggled with:
 
-Handling auth-based navigation flow
+1. **Navigation timing** - Ensuring the Firestore profile was created before navigating to the dashboard
+2. **Error handling** - Catching and displaying meaningful Firebase Auth exceptions (invalid email, weak password, user already exists)
+3. **Session persistence** - Understanding how Firebase maintains sessions across app restarts without explicit token management
+4. **Async operations** - Coordinating signup → profile creation → navigation in the correct order
 
-Firestore security rules understanding
+I solved these by adding proper try-catch blocks, using `await Future.delayed()` between operations, and implementing comprehensive form validation.
 
-🔹 What I Learned
+### How does StreamBuilder simplify navigation?
 
-How Firebase replaces a traditional backend
+Although this implementation uses manual navigation, StreamBuilder would simplify it significantly:
+```dart
+// Ideal implementation with StreamBuilder
+StreamBuilder(
+  stream: FirebaseAuth.instance.authStateChanges(),
+  builder: (ctx, snapshot) {
+    if (snapshot.hasData) {
+      return DashboardScreen(); // User logged in
+    }
+    return LoginScreen(); // User logged out
+  },
+)
+```
 
-Real-time data synchronization with Firestore
+**Benefits of StreamBuilder approach:**
+- **Automatic navigation** - No manual `Navigator.push()` calls needed
+- **Real-time updates** - UI rebuilds instantly when auth state changes
+- **Zero flicker** - Seamless transitions without visible routing
+- **Single source of truth** - Auth state determines which screen to show
+- **Cleaner code** - Eliminates navigation logic from individual screens
 
-Secure authentication without manual session handling
+### Why is logout essential for session security?
 
-Scalable architecture using Firebase services
+Logout is critical for multiple reasons:
 
-🔹 How Firebase Improves Scalability & Collaboration
+1. **Security on Shared Devices**
+   - Prevents unauthorized access if device is shared
+   - Protects sensitive task data from other users
+   - Essential in public or family devices
 
-Automatically scales with user growth
+2. **Session Management**
+   - Properly terminates Firebase session and clears tokens
+   - Invalidates authentication credentials
+   - Prevents session hijacking or token reuse
 
-Real-time updates across devices
+3. **Privacy Protection**
+   - Ensures user data isn't accessible after they leave
+   - Prevents accidental data exposure
+   - Complies with data protection best practices
 
-No backend server maintenance
+4. **User Control**
+   - Gives users explicit control over their authenticated state
+   - Allows switching between multiple accounts
+   - Builds trust by respecting user autonomy
 
-Ideal for collaborative and live apps
+In our implementation, `FirebaseAuth.instance.signOut()` handles all of this automatically, clearing the session and triggering a redirect to the login screen.
