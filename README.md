@@ -1,112 +1,219 @@
-Managio – Freelancer Task Management App
+Managio – Firebase-Integrated Freelancer Task Management App
 
-Managio is a Flutter-based task management application that uses Firebase as a backend to help freelancers manage tasks, deadlines, and workflows in a unified and real-time system.
+Managio is a Flutter-based task management application designed for freelancers to efficiently manage tasks using Firebase Authentication and Cloud Firestore.
+This project demonstrates a complete Firebase setup including secure authentication, real-time database operations, and persistent user sessions.
 
-🚀 Problem Statement
+🔥 Firebase Setup – Brief Overview
 
-Freelancers often juggle multiple tasks, client deadlines, and follow-ups without a centralized platform, leading to confusion and missed work.
-Managio solves this by providing a secure, scalable, and real-time task management solution.
+Firebase is used as the backend for Managio to handle:
 
-🧩 Features
+Secure user authentication (Email & Password)
 
-Unified Login & Signup screen
+Real-time database operations using Cloud Firestore
 
-Secure Email/Password Authentication
+Persistent login sessions without manual backend management
 
-Real-time task updates using Cloud Firestore
+This setup removes the need for a traditional server while ensuring scalability and security.
 
-Automatic navigation based on authentication state
+📌 Sprint-2 Objective
+
+Integrate Firebase Authentication and Cloud Firestore into a Flutter application to enable:
+
+Secure user login and signup
+
+Persistent authentication state
+
+Real-time database CRUD operations
+
+Scalable backend without a traditional server
+
+🔐 Step-by-Step Implementation Guide
+1️⃣ Firebase Project Setup
+
+Created a Firebase project in Firebase Console
+
+Added a Web App to the project
+
+Enabled Email/Password Authentication
+
+Enabled Cloud Firestore in test mode
+
+2️⃣ Firebase Configuration in Flutter
+
+Installed Firebase CLI and FlutterFire CLI, then ran:
+
+flutterfire configure
+
+
+Added required dependencies in pubspec.yaml and initialized Firebase in main.dart.
+
+3️⃣ Authentication Implementation (Email & Password)
+🔐 Signup
+Future<User?> signUp(String email, String password) async {
+  final credential = await FirebaseAuth.instance
+      .createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+  return credential.user;
+}
+
+🔐 Login
+Future<User?> login(String email, String password) async {
+  final credential = await FirebaseAuth.instance
+      .signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+  return credential.user;
+}
+
+
+Firebase automatically manages:
+
+Password hashing
+
+Secure session tokens
+
+Authentication state persistence
+
+4️⃣ Firestore Database CRUD Operations
+
+Each authenticated user can add, edit, delete, and view tasks stored under their user document.
+
+➕ Add Record
+Future<void> addTask(String uid, Map<String, dynamic> data) async {
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection('tasks')
+      .add(data);
+}
+
+✏️ Update Record
+Future<void> updateTask(String uid, String taskId, Map<String, dynamic> data) async {
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection('tasks')
+      .doc(taskId)
+      .update(data);
+}
+
+❌ Delete Record
+Future<void> deleteTask(String uid, String taskId) async {
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection('tasks')
+      .doc(taskId)
+      .delete();
+}
+
+
+Firestore enables:
+
+Real-time sync
+
+Automatic UI updates
+
+Secure, scalable data storage
+
+🧩 Features Implemented
+
+Unified Login / Signup Screen
+
+Email & Password Authentication
+
+Auth-based navigation flow
+
+Firestore CRUD operations
+
+Real-time database updates
 
 Persistent user sessions
 
-Clean and modular architecture
+Clean service-based architecture
 
 🛠️ Tech Stack
 
-Flutter – Cross-platform UI development
+Flutter – UI framework
+
+Firebase Core – Firebase initialization
 
 Firebase Authentication – User management
 
 Cloud Firestore – Real-time database
 
-Firebase Core – App initialization
+📸 Screenshots (Required)
 
-🔥 Firebase Setup Steps
+Below screenshots demonstrate successful Firebase integration:
 
-Create a Firebase project from Firebase Console
+✅ Firebase Authentication → Users
 
-Enable Authentication → Email/Password
+✅ Cloud Firestore → Data
 
-Enable Cloud Firestore
+✅ Working Login & Signup Screen
 
-Add Firebase dependencies in pubspec.yaml
+✅ Add / Edit / Delete Firestore Records
 
-Configure Firebase using firebase_options.dart
+✅ Project Folder Structure
 
-Initialize Firebase in main.dart
+![Firebase Auth Users](screenshots/auth_users.png)
+![Firestore Data](screenshots/firestore_data.png)
+![Firebase Console](screenshots/firebase_console.png)
+![User Task](screenshots/user_task.png)
+![Folder Structure](screenshots/folder_struc.png)
 
-Use Firebase Auth and Firestore through service classes
+🧠 Reflection
+❓ Why is Firebase a popular choice for mobile backends?
 
-🔄 How Firestore Real-Time Sync Works
+Firebase provides ready-to-use services like authentication, real-time databases, and hosting without requiring backend server management. It automatically scales with user growth and integrates seamlessly with mobile frameworks like Flutter.
 
-Tasks are stored as documents in Firestore collections
+⚠️ Most Challenging Step in Setup
 
-Firestore provides real-time listeners
+Firebase web configuration mismatches
 
-Any data change is instantly pushed to connected clients
+Ensuring correct initialization order in Flutter
 
-No manual refresh or polling is required
+Handling authentication-based navigation
 
-This ensures smooth and instant updates across devices.
+Understanding Firestore security rules
 
-📸 Proof of Real-Time Updates
+🚀 How This Integration Prepares the App for Future Features
 
-Firebase Console → Firestore → Data shows task updates instantly
+This Firebase setup enables:
 
-Firebase Console → Authentication → Users shows live user registrations
+Easy addition of role-based access control
 
-No app reload required to reflect changes
+Real-time collaboration features
 
-(Screenshots or console logs can be added here)
+Secure user-specific data storage
 
-🏗️ Application Flow
+Scalable backend for production-level apps
 
-App checks authentication state on launch
+Firebase makes Managio ready for advanced authentication flows and complex database-driven features.
 
-Unauthenticated users see login/signup screen
+📂 Project Structure Overview
 
-Successful login redirects to dashboard
+This project follows Flutter’s recommended folder structure for scalability and clean code organization.
 
-Tasks sync instantly using Firestore
+Core app logic is inside the lib/ directory
 
-User session persists across restarts
+Android and iOS builds are handled separately
 
-🧠 Reflection: Why Firebase?
+Assets, tests, and configurations are well-organized
 
-Firebase simplified backend development by:
+📄 Detailed Explanation
 
-Eliminating server and API management
+For a complete breakdown of each folder and file, refer to:
 
-Providing built-in authentication and security
+➡️ PROJECT_STRUCTURE.md
 
-Offering real-time data synchronization
+This document explains:
 
-Automatically scaling with user growth
+Purpose of each major folder
 
-This allowed faster development and a better user experience.
+Flutter’s cross-platform build flow
 
-🔮 Future Enhancements
-
-Task editing and deletion
-
-Client-based task grouping
-
-Payment and deadline tracking
-
-Push notifications
-
-Offline support
-
-✅ Conclusion
-
-Managio demonstrates how Firebase can fully replace a traditional backend for Flutter apps, enabling secure authentication, real-time updates, and scalability with minimal effort.
+Benefits of a well-structured Flutter project
