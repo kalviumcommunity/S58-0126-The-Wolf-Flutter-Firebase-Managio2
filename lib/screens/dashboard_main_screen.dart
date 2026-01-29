@@ -5,7 +5,6 @@ import 'dashboard_analytics_screen.dart';
 import 'clients_screen.dart';
 import 'projects_screen.dart';
 import 'profile_screen.dart';
-import 'login_screen.dart';
 import 'scrollable_views_screen.dart';
 import 'stateless_stateful_demo.dart';
 
@@ -36,16 +35,59 @@ class _DashboardMainScreenState extends State<DashboardMainScreen> {
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context), 
+            child: const Text('Cancel')
+          ),
           ElevatedButton(
             onPressed: () async {
-              await _authService.signOut();
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+              // Close the dialog first
+              Navigator.pop(context);
+              
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+              
+              try {
+                // Sign out - this will trigger authStateChanges() in main.dart
+                // which will automatically redirect to LoginScreen
+                await _authService.signOut();
+                
+                // Close loading dialog
+                if (mounted) {
+                  Navigator.pop(context);
+                  
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logged out successfully'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } catch (e) {
+                // Close loading dialog
+                if (mounted) {
+                  Navigator.pop(context);
+                  
+                  // Show error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error logging out: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
+              
+              // No manual navigation needed!
+              // authStateChanges() will automatically redirect to LoginScreen
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Logout'),
@@ -57,9 +99,22 @@ class _DashboardMainScreenState extends State<DashboardMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get current user email for display
+    final user = FirebaseAuth.instance.currentUser;
+    final userEmail = user?.email ?? 'User';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MANAGIO'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text('MANAGIO'),
+            Text(
+              userEmail,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+            ),
+          ],
+        ),
         centerTitle: true,
         elevation: 4,
         actions: [
@@ -91,6 +146,7 @@ class _DashboardMainScreenState extends State<DashboardMainScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
             onPressed: _logout,
           ),
         ],
@@ -100,11 +156,25 @@ class _DashboardMainScreenState extends State<DashboardMainScreen> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Projects'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Clients'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard), 
+            label: 'Dashboard'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.work), 
+            label: 'Projects'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people), 
+            label: 'Clients'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person), 
+            label: 'Profile'
+          ),
         ],
       ),
     );
