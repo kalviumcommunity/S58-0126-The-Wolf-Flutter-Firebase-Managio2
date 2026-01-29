@@ -334,8 +334,9 @@ class ScrollableViews extends StatelessWidget {
 This layout effectively showcases both widgets by combining a horizontal scrollable list and a vertical grid.
 📸 Scrollable Views Screenshots
 ListView Horizontal Scrolling
-[Add screenshot showing horizontal ListView with multiple cards]
+![smooth scrolling](screenshots/smooth_scrolling.png)
 Features demonstrated:
+
 
 Horizontal scroll direction
 Multiple card items
@@ -343,7 +344,6 @@ Smooth scrolling behavior
 Color-coded tiles for visual distinction
 
 GridView Multi-Column Layout
-[Add screenshot showing GridView with 2-column layout]
 Features demonstrated:
 
 2-column grid structure
@@ -352,7 +352,6 @@ Colorful tiles using Material color palette
 Smooth vertical scrolling
 
 Combined View (ListView + GridView)
-[Add screenshot showing both widgets in one screen]
 Features demonstrated:
 
 SingleChildScrollView parent widget

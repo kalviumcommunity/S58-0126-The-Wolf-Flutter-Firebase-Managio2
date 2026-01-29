@@ -1,34 +1,54 @@
 import 'package:flutter/material.dart';
 
-/// STATELESS WIDGET DEMO
-/// This widget displays a static header that doesn't change unless the parent
-/// rebuilds it with different parameters.
-class AppHeader extends StatelessWidget {
+/// Assignment 2.14: Demonstrating Stateless and Stateful Widgets
+/// 
+/// This screen demonstrates the difference between StatelessWidget and StatefulWidget
+/// through an interactive demo app.
+
+// =============================================================================
+// STATELESS WIDGET EXAMPLES
+// =============================================================================
+
+/// A simple StatelessWidget that displays a static header
+/// This widget never changes its content once built
+class StaticHeader extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const AppHeader({
+  const StaticHeader({
+    super.key,
     required this.title,
     required this.subtitle,
-    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    print('[STATELESS] AppHeader built with title: $title');
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue.shade800, Colors.blue.shade600],
+          colors: [Colors.blue.shade700, Colors.blue.shade400],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Icon(
+            Icons.widgets,
+            color: Colors.white,
+            size: 48,
+          ),
+          const SizedBox(height: 16),
           Text(
             title,
             style: const TextStyle(
@@ -40,9 +60,9 @@ class AppHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             subtitle,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withOpacity(0.9),
             ),
           ),
         ],
@@ -51,30 +71,38 @@ class AppHeader extends StatelessWidget {
   }
 }
 
-/// STATELESS WIDGET - Information Card
-/// Displays static information about the current feature
-class FeatureCard extends StatelessWidget {
+/// A StatelessWidget that displays information cards
+class InfoCard extends StatelessWidget {
   final String title;
   final String description;
   final IconData icon;
+  final Color color;
 
-  const FeatureCard({
+  const InfoCard({
+    super.key,
     required this.title,
     required this.description,
     required this.icon,
-    super.key,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icon, size: 40, color: Colors.blue.shade600),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 32),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -83,7 +111,7 @@ class FeatureCard extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -91,7 +119,7 @@ class FeatureCard extends StatelessWidget {
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -105,8 +133,12 @@ class FeatureCard extends StatelessWidget {
   }
 }
 
-/// STATEFUL WIDGET DEMO
-/// This widget manages interactive state and demonstrates how setState() works
+// =============================================================================
+// STATEFUL WIDGET EXAMPLES
+// =============================================================================
+
+/// A StatefulWidget that manages a counter
+/// This demonstrates how state changes trigger UI updates
 class InteractiveCounter extends StatefulWidget {
   const InteractiveCounter({super.key});
 
@@ -115,238 +147,297 @@ class InteractiveCounter extends StatefulWidget {
 }
 
 class _InteractiveCounterState extends State<InteractiveCounter> {
-  int count = 0;
-  bool isDarkMode = false;
-  List<String> history = [];
-  bool showHistory = false;
+  int _count = 0;
 
   void _increment() {
     setState(() {
-      count++;
-      history.add('Incremented to $count');
-      print('[STATEFUL] Counter incremented: $count');
+      _count++;
     });
   }
 
   void _decrement() {
     setState(() {
-      if (count > 0) {
-        count--;
-        history.add('Decremented to $count');
-        print('[STATEFUL] Counter decremented: $count');
-      }
+      if (_count > 0) _count--;
     });
   }
 
   void _reset() {
     setState(() {
-      count = 0;
-      history.add('Reset counter to 0');
-      history.clear();
-      print('[STATEFUL] Counter reset');
-    });
-  }
-
-  void _toggleDarkMode() {
-    setState(() {
-      isDarkMode = !isDarkMode;
-      history.add(isDarkMode ? 'Switched to Dark Mode' : 'Switched to Light Mode');
-      print('[STATEFUL] Dark mode toggled: $isDarkMode');
-    });
-  }
-
-  void _toggleHistory() {
-    setState(() {
-      showHistory = !showHistory;
-      print('[STATEFUL] History visibility toggled: $showHistory');
+      _count = 0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    print('[STATEFUL] _InteractiveCounterState.build() called - count: $count');
-
     return Card(
-      elevation: 8,
-      margin: const EdgeInsets.all(16),
-      color: isDarkMode ? Colors.grey.shade900 : Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            // Counter Display
+            const Text(
+              'Interactive Counter',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.blue.shade300,
-                  width: 2,
+                color: Colors.blue.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                '$_count',
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue.shade700,
                 ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _decrement,
+                  icon: const Icon(Icons.remove),
+                  label: const Text('Decrease'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade400,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _increment,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Increase'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade400,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _reset,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reset'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A StatefulWidget that toggles between light and dark mode
+class ThemeToggle extends StatefulWidget {
+  const ThemeToggle({super.key});
+
+  @override
+  State<ThemeToggle> createState() => _ThemeToggleState();
+}
+
+class _ThemeToggleState extends State<ThemeToggle> {
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      color: _isDarkMode ? Colors.grey.shade900 : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Text(
+              'Theme Switcher',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: _isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 24),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: _isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
-                  Text(
-                    'Current Count',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
-                    ),
+                  Icon(
+                    _isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                    size: 64,
+                    color: _isDarkMode ? Colors.yellow : Colors.orange,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Text(
-                    '$count',
+                    _isDarkMode ? 'Dark Mode' : 'Light Mode',
                     style: TextStyle(
-                      fontSize: 64,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade600,
+                      color: _isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-
-            // Control Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildButton(
-                  icon: Icons.remove,
-                  label: 'Decrease',
-                  onPressed: _decrement,
-                  color: Colors.red,
-                ),
-                _buildButton(
-                  icon: Icons.refresh,
-                  label: 'Reset',
-                  onPressed: _reset,
-                  color: Colors.orange,
-                ),
-                _buildButton(
-                  icon: Icons.add,
-                  label: 'Increase',
-                  onPressed: _increment,
-                  color: Colors.green,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Mode Toggle
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _toggleDarkMode,
-                    icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
-                    label: Text(isDarkMode ? 'Light Mode' : 'Dark Mode'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? Colors.grey.shade700 : Colors.blue.shade100,
-                      foregroundColor: isDarkMode ? Colors.white : Colors.blue.shade900,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _toggleHistory,
-                    icon: Icon(showHistory ? Icons.visibility_off : Icons.visibility),
-                    label: Text(showHistory ? 'Hide History' : 'Show History'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? Colors.grey.shade700 : Colors.purple.shade100,
-                      foregroundColor: isDarkMode ? Colors.white : Colors.purple.shade900,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // History Section (Conditional Rendering)
-            if (showHistory && history.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey.shade800 : Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.amber.shade200,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Action History',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.amber.shade300 : Colors.amber.shade900,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ...history.asMap().entries.map((e) {
-                      final index = e.key;
-                      final action = e.value;
-                      return Text(
-                        '${index + 1}. $action',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.grey.shade300 : Colors.grey.shade700,
-                        ),
-                      );
-                    }),
-                  ],
+            ElevatedButton.icon(
+              onPressed: _toggleTheme,
+              icon: Icon(_isDarkMode ? Icons.wb_sunny : Icons.nightlight_round),
+              label: Text(_isDarkMode ? 'Switch to Light' : 'Switch to Dark'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _isDarkMode ? Colors.blue.shade700 : Colors.blue.shade400,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
                 ),
               ),
-
-            if (showHistory && history.isEmpty)
-              Text(
-                'No actions yet',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade400,
-                ),
-              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onPressed,
-    required Color color,
-  }) {
-    return Column(
-      children: [
-        FloatingActionButton(
-          onPressed: onPressed,
-          mini: true,
-          backgroundColor: color,
-          child: Icon(icon, color: Colors.white),
+/// A StatefulWidget that changes colors interactively
+class ColorChanger extends StatefulWidget {
+  const ColorChanger({super.key});
+
+  @override
+  State<ColorChanger> createState() => _ColorChangerState();
+}
+
+class _ColorChangerState extends State<ColorChanger> {
+  int _currentColorIndex = 0;
+  final List<Color> _colors = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+    Colors.pink,
+  ];
+
+  final List<String> _colorNames = [
+    'Red',
+    'Green',
+    'Blue',
+    'Orange',
+    'Purple',
+    'Teal',
+    'Pink',
+  ];
+
+  void _changeColor() {
+    setState(() {
+      _currentColorIndex = (_currentColorIndex + 1) % _colors.length;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            const Text(
+              'Color Changer',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: _colors[_currentColorIndex],
+                borderRadius: BorderRadius.circular(75),
+                boxShadow: [
+                  BoxShadow(
+                    color: _colors[_currentColorIndex].withOpacity(0.5),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.palette,
+                  color: Colors.white,
+                  size: 64,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              _colorNames[_currentColorIndex],
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: _colors[_currentColorIndex],
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _changeColor,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Change Color'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _colors[_currentColorIndex],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.grey.shade300 : Colors.grey.shade700,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-/// MAIN DEMO SCREEN
-/// Combines StatelessWidget and StatefulWidget to show both patterns
+// =============================================================================
+// MAIN DEMO SCREEN
+// =============================================================================
+
+/// Main screen that combines both Stateless and Stateful widgets
 class StatelessStatefulDemoScreen extends StatelessWidget {
   const StatelessStatefulDemoScreen({super.key});
 
@@ -354,113 +445,127 @@ class StatelessStatefulDemoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stateless & Stateful Widgets'),
+        title: const Text('Stateless vs Stateful Demo'),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade800,
+        elevation: 2,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Static Header (Stateless Widget)
-            const AppHeader(
-              title: 'Flutter Widget Demo',
-              subtitle: 'Understanding Stateless & Stateful Widgets',
+            // Stateless Widget: Static Header
+            const StaticHeader(
+              title: 'Widget Demo App',
+              subtitle: 'Learn the difference between Stateless and Stateful widgets',
             ),
+            
             const SizedBox(height: 24),
 
-            // Feature Description (Stateless Widgets)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12),
-              child: Text(
-                'What You\'ll Learn',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            // Section Header
+            const Text(
+              'STATELESS WIDGETS',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+                letterSpacing: 1.2,
               ),
             ),
-            const FeatureCard(
-              icon: Icons.panorama_photosphere_select,
-              title: 'Stateless Widgets',
-              description: 'Static UI that doesn\'t change unless parent rebuilds. Perfect for static content.',
-            ),
-            const FeatureCard(
-              icon: Icons.stacked_line_chart,
-              title: 'Stateful Widgets',
-              description: 'Dynamic UI that responds to user interactions. Uses setState() to update.',
-            ),
-            const FeatureCard(
-              icon: Icons.update,
-              title: 'State Management',
-              description: 'Learn how Flutter efficiently rebuilds only the widgets that changed.',
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
-            // Interactive Counter (Stateful Widget)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12),
-              child: Text(
-                'Interactive Example',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            // Stateless Widget: Info Cards
+            const InfoCard(
+              title: 'Stateless Widget',
+              description: 'Immutable and never changes after being built',
+              icon: Icons.check_circle,
+              color: Colors.green,
+            ),
+            const SizedBox(height: 12),
+            const InfoCard(
+              title: 'No Internal State',
+              description: 'UI remains constant unless rebuilt by parent',
+              icon: Icons.lock,
+              color: Colors.blue,
+            ),
+
+            const SizedBox(height: 32),
+
+            // Section Header
+            const Text(
+              'STATEFUL WIDGETS',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+                letterSpacing: 1.2,
               ),
             ),
+            const SizedBox(height: 12),
+
+            // Stateful Widget: Counter
             const InteractiveCounter(),
+            
+            const SizedBox(height: 16),
+
+            // Stateful Widget: Theme Toggle
+            const ThemeToggle(),
+            
+            const SizedBox(height: 16),
+
+            // Stateful Widget: Color Changer
+            const ColorChanger(),
+
             const SizedBox(height: 24),
 
-            // Summary
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade200),
+            // Summary Card (Stateless)
+            Card(
+              elevation: 2,
+              color: Colors.amber.shade50,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Key Concepts',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.lightbulb, color: Colors.amber.shade700),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Key Takeaways',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildBulletPoint('StatelessWidget: Immutable, no internal state, fast to render'),
-                  _buildBulletPoint('StatefulWidget: Mutable, manages state with setState(), reactive'),
-                  _buildBulletPoint('setState(): Triggers rebuild of widget and its children'),
-                  _buildBulletPoint('Element Tree: Reuses components efficiently between rebuilds'),
-                  _buildBulletPoint('Reactive Model: UI automatically reflects current state'),
-                ],
+                    const SizedBox(height: 12),
+                    const Text(
+                      '• StatelessWidget: Use for static UI that doesn\'t change',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      '• StatefulWidget: Use for dynamic UI that responds to user interaction',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      '• setState(): Triggers UI rebuild when state changes',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 24),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBulletPoint(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('• ', style: TextStyle(fontSize: 16)),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 12),
-            ),
-          ),
-        ],
       ),
     );
   }

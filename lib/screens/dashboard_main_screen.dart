@@ -7,6 +7,7 @@ import 'projects_screen.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
 import 'scrollable_views_screen.dart';
+import 'stateless_stateful_demo.dart';
 
 class DashboardMainScreen extends StatefulWidget {
   const DashboardMainScreen({super.key});
@@ -62,7 +63,7 @@ class _DashboardMainScreenState extends State<DashboardMainScreen> {
         centerTitle: true,
         elevation: 4,
         actions: [
-          // Demo button for Assignment 2.19
+          // Demo button for Assignment 2.19 - Scrollable Views
           IconButton(
             icon: const Icon(Icons.view_list),
             tooltip: 'Scrollable Views Demo',
@@ -71,6 +72,19 @@ class _DashboardMainScreenState extends State<DashboardMainScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ScrollableViewsScreen(),
+                ),
+              );
+            },
+          ),
+          // Demo button for Assignment 2.14 - Stateless/Stateful Widgets
+          IconButton(
+            icon: const Icon(Icons.widgets),
+            tooltip: 'Widget Types Demo',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StatelessStatefulDemoScreen(),
                 ),
               );
             },
