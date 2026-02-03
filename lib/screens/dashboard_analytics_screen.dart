@@ -5,32 +5,188 @@ class DashboardAnalyticsScreen extends StatefulWidget {
   const DashboardAnalyticsScreen({super.key});
 
   @override
-  State<DashboardAnalyticsScreen> createState() => _DashboardAnalyticsScreenState();
+  State<DashboardAnalyticsScreen> createState() =>
+      _DashboardAnalyticsScreenState();
 }
 
-class _DashboardAnalyticsScreenState extends State<DashboardAnalyticsScreen> {
+class _DashboardAnalyticsScreenState
+    extends State<DashboardAnalyticsScreen> {
   final FirestoreService _firestore = FirestoreService();
+  
+  // Key to force Future rebuild on retry
+  int _futureKey = 0;
+
+  Future<Map<String, dynamic>> _loadAnalytics() async {
+    try {
+      final analytics = await _firestore.getAnalytics();
+      
+      // Log for debugging
+      debugPrint('Analytics loaded: $analytics');
+      
+      return analytics;
+    } catch (e) {
+      // Log error for debugging
+      debugPrint('Error loading analytics: $e');
+      rethrow; // Re-throw to be handled by FutureBuilder
+    }
+  }
+
+  void _retryLoadingAnalytics() {
+    setState(() {
+      _futureKey++; // Change key to rebuild FutureBuilder
+    });
+  }
+
+  String _getFriendlyErrorMessage(dynamic error) {
+    final errorString = error.toString().toLowerCase();
+    
+    if (errorString.contains('network') || errorString.contains('connection')) {
+      return 'Network error. Please check your internet connection.';
+    } else if (errorString.contains('permission')) {
+      return 'Permission denied. Please contact support.';
+    } else if (errorString.contains('timeout')) {
+      return 'Request timed out. Please try again.';
+    } else {
+      return 'Unable to load dashboard data. Please try again.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
+      appBar: AppBar(
+        title: const Text('Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: _retryLoadingAnalytics,
+          ),
+        ],
+      ),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: _firestore.getAnalytics(),
+        key: ValueKey(_futureKey), // Forces rebuild when key changes
+        future: _loadAnalytics(),
         builder: (context, snapshot) {
+          // LOADING STATE
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading dashboard...',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
-          if (snapshot.hasError || !snapshot.hasData) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          // ERROR STATE
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.cloud_off,
+                      size: 64,
+                      color: Colors.red.shade300,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Unable to Load Dashboard',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _getFriendlyErrorMessage(snapshot.error),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: _retryLoadingAnalytics,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Try Again'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
+          // EMPTY/NULL DATA STATE (edge case)
+          if (!snapshot.hasData) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.dashboard,
+                      size: 64,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No Data Available',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Start adding projects and clients\nto see your analytics',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: _retryLoadingAnalytics,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Refresh'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // SUCCESS STATE - Display analytics
           final analytics = snapshot.data!;
 
           return RefreshIndicator(
             onRefresh: () async {
-              setState(() {});
+              _retryLoadingAnalytics();
+              // Wait for rebuild
+              await Future.delayed(const Duration(milliseconds: 500));
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -50,11 +206,12 @@ class _DashboardAnalyticsScreenState extends State<DashboardAnalyticsScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Analytics Cards using GridView.builder (Assignment 2.19)
+                  // Analytics Cards using GridView.builder
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
@@ -65,13 +222,15 @@ class _DashboardAnalyticsScreenState extends State<DashboardAnalyticsScreen> {
                       final cards = [
                         {
                           'title': 'Total Earned',
-                          'value': '\$${analytics['totalEarned'].toStringAsFixed(2)}',
+                          'value':
+                              '\$${analytics['totalEarned'].toStringAsFixed(2)}',
                           'icon': Icons.attach_money,
                           'color': Colors.green,
                         },
                         {
                           'title': 'Pending Amount',
-                          'value': '\$${analytics['pendingAmount'].toStringAsFixed(2)}',
+                          'value':
+                              '\$${analytics['pendingAmount'].toStringAsFixed(2)}',
                           'icon': Icons.hourglass_empty,
                           'color': Colors.orange,
                         },
@@ -114,10 +273,12 @@ class _DashboardAnalyticsScreenState extends State<DashboardAnalyticsScreen> {
                         children: [
                           const Text(
                             'Quick Stats',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          _buildStatRow('Total Tasks', '${analytics['totalTasks']}'),
+                          _buildStatRow(
+                              'Total Tasks', '${analytics['totalTasks']}'),
                           const Divider(height: 24),
                           _buildStatRow(
                             'Completed Tasks',
@@ -144,7 +305,7 @@ class _DashboardAnalyticsScreenState extends State<DashboardAnalyticsScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Horizontal scrollable list of action buttons (Assignment 2.19)
+                  // Horizontal scrollable list of action buttons
                   SizedBox(
                     height: 120,
                     child: ListView.builder(

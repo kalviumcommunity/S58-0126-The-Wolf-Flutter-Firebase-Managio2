@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// SplashScreen displays while the app checks authentication state
-/// This provides a professional UX while Firebase Auth verifies session persistence
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -11,7 +9,10 @@ class SplashScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue.shade700, Colors.blue.shade400],
+            colors: [
+              Colors.blue.shade700,
+              Colors.blue.shade400,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -20,12 +21,18 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // App Logo/Icon
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.business_center,
@@ -33,10 +40,9 @@ class SplashScreen extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
-              // App Name
+
               const Text(
                 'MANAGIO',
                 style: TextStyle(
@@ -46,10 +52,9 @@ class SplashScreen extends StatelessWidget {
                   letterSpacing: 2,
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
-              // Tagline
+
               Text(
                 'Manage Your Business Efficiently',
                 style: TextStyle(
@@ -58,10 +63,9 @@ class SplashScreen extends StatelessWidget {
                   letterSpacing: 0.5,
                 ),
               ),
-              
+
               const SizedBox(height: 48),
-              
-              // Loading Indicator
+
               const SizedBox(
                 width: 40,
                 height: 40,
@@ -70,15 +74,26 @@ class SplashScreen extends StatelessWidget {
                   strokeWidth: 3,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
-              // Loading Text
+
+              // Loading message
               Text(
                 'Loading...',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white.withOpacity(0.8),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Additional context (optional)
+              Text(
+                'Checking authentication',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.6),
                 ),
               ),
             ],
