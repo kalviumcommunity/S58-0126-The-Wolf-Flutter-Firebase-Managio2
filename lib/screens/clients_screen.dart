@@ -322,93 +322,99 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 final client = clients[index];
                 final data = client.data() as Map<String, dynamic>;
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      radius: 28,
-                      backgroundColor:
-                          Colors.primaries[index % Colors.primaries.length],
-                      child: Text(
-                        data['name'][0].toUpperCase(),
+                // AnimatedOpacity wraps each Card — staggered fade-in effect
+                return AnimatedOpacity(
+                  opacity: 1.0,
+                  duration: Duration(milliseconds: 400 + (index * 80)),
+                  curve: Curves.easeIn,
+                  child: Card(                          // ← Card opens
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      leading: CircleAvatar(
+                        radius: 28,
+                        backgroundColor:
+                            Colors.primaries[index % Colors.primaries.length],
+                        child: Text(
+                          data['name'][0].toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        data['name'],
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                    ),
-                    title: Text(
-                      data['name'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(Icons.business,
-                                size: 14, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Text(data['company']),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            const Icon(Icons.email,
-                                size: 14, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                data['email'],
-                                overflow: TextOverflow.ellipsis,
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.business,
+                                  size: 14, color: Colors.grey),
+                              const SizedBox(width: 4),
+                              Text(data['company']),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              const Icon(Icons.email,
+                                  size: 14, color: Colors.grey),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  data['email'],
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      trailing: PopupMenuButton(
+                        icon: const Icon(Icons.more_vert),
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            child: const Row(
+                              children: [
+                                Icon(Icons.edit, size: 20),
+                                SizedBox(width: 8),
+                                Text('Edit'),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    trailing: PopupMenuButton(
-                      icon: const Icon(Icons.more_vert),
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          child: const Row(
-                            children: [
-                              Icon(Icons.edit, size: 20),
-                              SizedBox(width: 8),
-                              Text('Edit'),
-                            ],
+                            onTap: () => _showEditDialog(client.id, data),
                           ),
-                          onTap: () => _showEditDialog(client.id, data),
-                        ),
-                        PopupMenuItem(
-                          child: const Row(
-                            children: [
-                              Icon(Icons.delete, size: 20, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('Delete',
-                                  style: TextStyle(color: Colors.red)),
-                            ],
+                          PopupMenuItem(
+                            child: const Row(
+                              children: [
+                                Icon(Icons.delete, size: 20, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('Delete',
+                                    style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                            onTap: () => _deleteClient(client.id),
                           ),
-                          onTap: () => _deleteClient(client.id),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  ),                                   // ← Card closes
+                );                                     // ← AnimatedOpacity closes
               },
             ),
           );

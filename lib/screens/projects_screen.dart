@@ -206,11 +206,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   subtitle: Text('\$${data['budget']} • ${data['status']}'),
                   trailing: isOverdue ? const Icon(Icons.warning, color: Colors.red) : null,
                   onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProjectDetailsScreen(projectId: project.id, projectData: data),
-                    ),
-                  ),
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        ProjectDetailsScreen(projectId: project.id, projectData: data),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1.0, 0.0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        )),
+        child: child,
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 600),
+  ),
+),
                 ),
               );
             },

@@ -1,7 +1,44 @@
 import 'package:flutter/material.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack, // slight overshoot for polish
+    );
+
+    _opacityAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,35 +58,54 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+              // ANIMATED LOGO — explicit animation (AnimationController)
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _opacityAnimation.value,
+                    child: Transform.scale(
+                      scale: _scaleAnimation.value,
+                      child: child,
                     ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.business_center,
-                  size: 80,
-                  color: Colors.white,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.business_center,
+                    size: 80,
+                    color: Colors.white,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 32),
 
-              const Text(
-                'MANAGIO',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 2,
+              // ANIMATED TEXT — implicit animation (AnimatedOpacity)
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeIn,
+                child: const Text(
+                  'MANAGIO',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
 
@@ -77,7 +133,6 @@ class SplashScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Loading message
               Text(
                 'Loading...',
                 style: TextStyle(
@@ -88,7 +143,6 @@ class SplashScreen extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              // Additional context (optional)
               Text(
                 'Checking authentication',
                 style: TextStyle(

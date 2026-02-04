@@ -129,11 +129,25 @@
                                   tooltip: 'Scrollable Views Demo',
                                   onPressed: () {
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const ScrollableViewsScreen(),
-                                      ),
-                                    );
+  context,
+  PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const ScrollableViewsScreen(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1.0, 0.0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        )),
+        child: child,
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 600),
+  ),
+);
                                   },
                                 ),
                                 // Demo button for Assignment 2.14 - Stateless/Stateful Widgets
