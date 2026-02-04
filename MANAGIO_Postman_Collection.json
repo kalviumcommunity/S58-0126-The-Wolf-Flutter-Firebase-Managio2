@@ -1,0 +1,536 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5g6h7",
+    "name": "MANAGIO - Flutter Firebase API",
+    "description": "Complete API documentation for MANAGIO freelancer management system using Flutter + Firebase. Version 1.0.0. Last Updated: 2025-01-30",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Sign Up (Create Account)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\",\n  \"returnSecureToken\": true\n}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDC5Zvqx_ZYT4kHvgHFSK-yxYDBWXFRwU0",
+              "protocol": "https",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signUp"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "AIzaSyDC5Zvqx_ZYT4kHvgHFSK-yxYDBWXFRwU0"
+                }
+              ]
+            },
+            "description": "Creates a new user account with email and password. Returns idToken (auth token) and localId (user ID) that you need for other requests."
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In (Login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\",\n  \"returnSecureToken\": true\n}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDC5Zvqx_ZYT4kHvgHFSK-yxYDBWXFRwU0",
+              "protocol": "https",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signInWithPassword"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "AIzaSyDC5Zvqx_ZYT4kHvgHFSK-yxYDBWXFRwU0"
+                }
+              ]
+            },
+            "description": "Authenticates user with email and password. Returns a fresh auth token. Use this if your token expires (tokens last 1 hour)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Firebase Authentication endpoints for user sign up and sign in"
+    },
+    {
+      "name": "2. Clients Management",
+      "item": [
+        {
+          "name": "Add Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"userId\": {\"stringValue\": \"YOUR_USER_ID_HERE\"},\n    \"name\": {\"stringValue\": \"Acme Corporation\"},\n    \"email\": {\"stringValue\": \"contact@acme.com\"},\n    \"phone\": {\"stringValue\": \"+1234567890\"},\n    \"company\": {\"stringValue\": \"Acme Corp\"},\n    \"createdAt\": {\"timestampValue\": \"2025-01-30T00:00:00Z\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/clients",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "clients"
+              ]
+            },
+            "description": "Adds a new client to Firestore. Replace YOUR_USER_ID_HERE with the localId from Sign Up/Sign In response."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/clients",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "clients"
+              ]
+            },
+            "description": "Retrieves all clients from Firestore. Returns an array of client documents."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Client",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"name\": {\"stringValue\": \"Updated Company Name\"},\n    \"email\": {\"stringValue\": \"newemail@acme.com\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/clients/CLIENT_ID_HERE?updateMask.fieldPaths=name&updateMask.fieldPaths=email",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "clients",
+                "CLIENT_ID_HERE"
+              ],
+              "query": [
+                {
+                  "key": "updateMask.fieldPaths",
+                  "value": "name"
+                },
+                {
+                  "key": "updateMask.fieldPaths",
+                  "value": "email"
+                }
+              ]
+            },
+            "description": "Updates client information. Replace CLIENT_ID_HERE with actual client document ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Client",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/clients/CLIENT_ID_HERE",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "clients",
+                "CLIENT_ID_HERE"
+              ]
+            },
+            "description": "Deletes a client from Firestore. Replace CLIENT_ID_HERE with actual client document ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing clients - add, view, update, and delete"
+    },
+    {
+      "name": "3. Projects Management",
+      "item": [
+        {
+          "name": "Add Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"userId\": {\"stringValue\": \"YOUR_USER_ID_HERE\"},\n    \"clientId\": {\"stringValue\": \"YOUR_CLIENT_ID_HERE\"},\n    \"title\": {\"stringValue\": \"Website Redesign Project\"},\n    \"description\": {\"stringValue\": \"Complete redesign of company website with modern UI/UX\"},\n    \"budget\": {\"doubleValue\": 5000.00},\n    \"deadline\": {\"timestampValue\": \"2025-03-30T00:00:00Z\"},\n    \"status\": {\"stringValue\": \"active\"},\n    \"createdAt\": {\"timestampValue\": \"2025-01-30T00:00:00Z\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/projects",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "projects"
+              ]
+            },
+            "description": "Creates a new project. Replace YOUR_USER_ID_HERE and YOUR_CLIENT_ID_HERE with actual IDs."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/projects",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "projects"
+              ]
+            },
+            "description": "Retrieves all projects from Firestore."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"status\": {\"stringValue\": \"completed\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/projects/PROJECT_ID_HERE?updateMask.fieldPaths=status",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "projects",
+                "PROJECT_ID_HERE"
+              ],
+              "query": [
+                {
+                  "key": "updateMask.fieldPaths",
+                  "value": "status"
+                }
+              ]
+            },
+            "description": "Updates project status. Status can be: active, completed, or on-hold."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing projects"
+    },
+    {
+      "name": "4. Tasks Management",
+      "item": [
+        {
+          "name": "Add Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"projectId\": {\"stringValue\": \"YOUR_PROJECT_ID_HERE\"},\n    \"title\": {\"stringValue\": \"Design homepage mockup\"},\n    \"description\": {\"stringValue\": \"Create wireframes and high-fidelity mockups for the new homepage\"},\n    \"deadline\": {\"timestampValue\": \"2025-02-15T00:00:00Z\"},\n    \"priority\": {\"stringValue\": \"high\"},\n    \"status\": {\"stringValue\": \"pending\"},\n    \"createdAt\": {\"timestampValue\": \"2025-01-30T00:00:00Z\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/tasks",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "tasks"
+              ]
+            },
+            "description": "Adds a new task to a project. Priority can be: high, medium, or low. Status: pending, in-progress, or completed."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/tasks",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "tasks"
+              ]
+            },
+            "description": "Retrieves all tasks from Firestore."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"status\": {\"stringValue\": \"completed\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/tasks/TASK_ID_HERE?updateMask.fieldPaths=status",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "tasks",
+                "TASK_ID_HERE"
+              ],
+              "query": [
+                {
+                  "key": "updateMask.fieldPaths",
+                  "value": "status"
+                }
+              ]
+            },
+            "description": "Updates task status to completed, pending, or in-progress."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing tasks within projects"
+    },
+    {
+      "name": "5. Payments Tracking",
+      "item": [
+        {
+          "name": "Add Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fields\": {\n    \"projectId\": {\"stringValue\": \"YOUR_PROJECT_ID_HERE\"},\n    \"clientId\": {\"stringValue\": \"YOUR_CLIENT_ID_HERE\"},\n    \"amount\": {\"doubleValue\": 2500.00},\n    \"paymentDate\": {\"timestampValue\": \"2025-01-30T00:00:00Z\"},\n    \"paymentMethod\": {\"stringValue\": \"bank-transfer\"},\n    \"status\": {\"stringValue\": \"completed\"},\n    \"createdAt\": {\"timestampValue\": \"2025-01-30T00:00:00Z\"}\n  }\n}"
+            },
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/payments",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "payments"
+              ]
+            },
+            "description": "Records a payment. Payment methods: cash, bank-transfer, credit-card, paypal. Status: pending or completed."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://firestore.googleapis.com/v1/projects/managio-3f008/databases/(default)/documents/payments",
+              "protocol": "https",
+              "host": [
+                "firestore",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "projects",
+                "managio-3f008",
+                "databases",
+                "(default)",
+                "documents",
+                "payments"
+              ]
+            },
+            "description": "Retrieves all payment records from Firestore."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for tracking payments and earnings"
+    }
+  ]
+}
