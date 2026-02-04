@@ -453,7 +453,7 @@ class _DashboardAnalyticsScreenState
       child: Container(
         width: 120,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.black,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withOpacity(0.3)),
         ),
